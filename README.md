@@ -1,29 +1,53 @@
-using UnityEngine;
+******STEP-BY-STEP: How to Apply 2D Character Movement in Godot 4
+✅ 1. Create a New Scene
+Open Godot 4.
 
-public class PlayerMovement : MonoBehaviour
-{
-    public float moveSpeed = 5f;                      // Movement speed of the character
-    private Vector2 movement;                         // Stores input movement direction
-    private Rigidbody2D rb;                           // Rigidbody2D component
+Click + Scene → Choose CharacterBody2D → name it Player.
 
-    void Start()
-    {
-        rb = GetComponent<Rigidbody2D>();             // Get the Rigidbody2D component
-    }
+Click "Save Scene As", name it Player.tscn.
 
-    void Update()
-    {
-        // Get input (WASD / Arrow keys)
-        movement.x = Input.GetAxisRaw("Horizontal");  // A/D or Left/Right
-        movement.y = Input.GetAxisRaw("Vertical");    // W/S or Up/Down
+✅ 2. Add Child Nodes
+In the Player node:
 
-        movement = movement.normalized;               // Normalize to prevent faster diagonal speed
-    }
+Add a Sprite2D (for the visual).
 
-    void FixedUpdate()
-    {
-        // Apply movement using Vector2
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
-    }
-}
+Drag in a PNG sprite or just use a placeholder (e.g. a colored square).
 
+Add a CollisionShape2D
+
+Choose a shape (e.g. rectangle) and size it to fit the sprite.
+
+✅ 3. Set Up the Input (WASD or Arrows)
+Go to Project > Project Settings > Input Map, and add these inputs:
+
+ui_up → [Add] → press W or Up
+
+ui_down → [Add] → press S or Down
+
+ui_left → [Add] → press A or Left
+
+ui_right → [Add] → press D or Right
+
+✅ These are the default Godot actions used in the code.
+
+✅ 4. Add the Script
+Option A: Using GDScript
+Right-click Player → Attach Script
+
+Use this code:
+
+gdscript
+Copy
+Edit
+extends CharacterBody2D
+
+@export var move_speed: float = 200.0
+
+func _physics_process(delta: float) -> void:
+    var input_vector := Vector2(
+        Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left"),
+        Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
+    ).normalized()
+
+    velocity = input_vector * move_speed
+    move_and_slide()
